@@ -1,0 +1,28 @@
+.genre-dropdown select {
+  height: 28px;
+  width: 150px;
+}
+
+.current-video-container {
+  height: 275px;
+}
+
+.current-video-thumbnail {
+  height: 275px;
+}
+
+.current-video-name {
+  text-align: left;
+  float:left;
+}
+
+.current-video-genre {
+  text-align: right;
+  float:right;
+}
+
+.next-video-button {
+  width: 350px;
+  display: block;
+  margin: 10px auto;
+}

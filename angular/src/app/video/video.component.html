@@ -1,0 +1,51 @@
+<div class="container">
+  <div class="row">
+
+    <div class="four columns">
+      <h3>VIDEOSMASH</h3>
+
+      <div class="genre-dropdown">
+        Genre:
+        <select [(ngModel)]="selectedGenre" (ngModelChange)="onGenreSelect(selectedGenre)">
+          <option [ngValue]="null">-- Please select --</option>
+          <option *ngFor="let genre of allGenres" [value]="genre.id">
+            {{ genre.name }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <div class="eight columns">
+
+      <h5>Currently Watching</h5>
+
+      <div *ngIf="randomVideo">
+        <div id="current-video-container">
+          <div class="current-video-thumbnail"
+               [style.background-color]="randomVideo.color">
+          </div>
+          <div class="current-video-name">
+            {{ randomVideo.name }}
+          </div>
+          <div class="current-video-genre">
+            {{randomVideo.genre.name}}
+          </div>
+          <div style="clear: both;"></div>
+        </div>
+      </div>
+
+      <button class="next-video-button" (click)="getNextNewVideo()">Next New
+        Video</button>
+
+      <h5>Previously Viewed</h5>
+
+      <table>
+        <tr *ngFor="let filteredVideo of filteredVideos">
+          <td>{{filteredVideo?.name}}</td>
+          <td>{{filteredVideo?.genre.name}}</td>
+        </tr>
+      </table>
+    </div>
+
+  </div>
+</div>
