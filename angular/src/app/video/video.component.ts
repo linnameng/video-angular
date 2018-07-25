@@ -18,20 +18,20 @@ export class VideoComponent implements OnInit {
   selectedGenreId: string;
   userId: String;
 
+  isNextButtonEnabled = false;
+  isDisplayNoVideoMessage = true;
+  noVideoMessage: string;
+
   COOKIE_USER_ID = 'userId';
   COOKIE_CURRENT_GENRE_ID = 'currentGenreId';
 
-  constructor(private router: Router, private videoService: VideoService, private _cookieService:CookieService) {
-    this.userId = this.getCookie('userId');
-
-    if (this.userId != null) {
-      console.log('Found existing userId cookie: ' + this.userId);
-      // set up stuff for existing user
-      this.selectedGenreId = this.getCookie('currentGenreId');
-      console.log('Found existing currentGenreId cookie: ' + this.selectedGenreId);
+  constructor(private router: Router, private videoService: VideoService, private _cookieService: CookieService) {
+    this.userId = this.getCookie(this.COOKIE_USER_ID);
+    // if we have a returning user, load the latest genre they have viewed
+    if (this.userId !== undefined) {
+      this.selectedGenreId = this.getCookie(this.COOKIE_CURRENT_GENRE_ID);
     } else {
-      this.putCookie('userId', this.getRandomId());
-      console.log('Created new userId cookie: ' + this.getCookie('userId'));
+      this.putCookie(this.COOKIE_USER_ID, this.generateRandomUserId());
       this.selectedGenreId = null;
     }
   }
@@ -40,6 +40,8 @@ export class VideoComponent implements OnInit {
     if (this.selectedGenreId != null) {
       this.getRandomVideoAndMarkAsViewed();
       this.getSeenVideosForGenre(this.selectedGenreId);
+    } else {
+      this.updateDisplayNoVideos();
     }
 
     this.videoService.getAllGenres()
@@ -48,71 +50,87 @@ export class VideoComponent implements OnInit {
       });
   }
 
+  onClickNextVideoButton() {
+    this.getRandomVideoAndMarkAsViewed();
+    this.getSeenVideosForGenre(this.selectedGenreId);
+  }
+
   getRandomVideoAndMarkAsViewed() {
-    let excludeIds = [''];
-
-    let initialGenreId = this.selectedGenreId;
-
-    if (initialGenreId === undefined) {
-      console.log('no genre');
+    const genreId = this.selectedGenreId;
+    if (genreId === undefined) {
       return;
     }
 
-    let seenVideosCookie = this.getCookie(initialGenreId);
-    console.log('loading random video, selectedGenre: ' + initialGenreId + ' seenVideosCookie: ' + seenVideosCookie);
-
-    if (seenVideosCookie !== undefined) {
-      console.log('seenVideosCookie is defined');
-      excludeIds = JSON.parse(seenVideosCookie);
-    }
-
-    this.videoService.getRandomVideoForGenre(initialGenreId, excludeIds)
+    const seenVideoIds = this.getSeenVideoIdsFromGenreCookie(genreId);
+    this.videoService.getRandomVideoForGenre(genreId, seenVideoIds)
       .subscribe( data => {
         this.randomVideo = data;
         if (this.randomVideo == undefined) {
-          console.log('random video undefined');
+          this.updateDisplayNoVideos();
           return;
         }
-        if (seenVideosCookie === undefined) {
-          this.putCookie(this.selectedGenreId, JSON.stringify([ this.randomVideo.id ]));
-          console.log('Creating cookie for genre: ' + this.selectedGenreId + ': ' + this.getCookie(this.selectedGenreId));
-        } else {
-          let genreArray = JSON.parse(seenVideosCookie);
-          console.log('genreArray: ' + genreArray);
-          genreArray.push(this.randomVideo.id);
-          this.putCookie(this.selectedGenreId, JSON.stringify(genreArray));
-          console.log('genre cookie: ' + this.getCookie(this.selectedGenreId));
-        }
+        this.isNextButtonEnabled = true;
+        this.updateGenreCookie(genreId, this.randomVideo);
       });
-
   }
 
-  onGenreSelect(genreId){
+  updateDisplayNoVideos() {
+    if (this.selectedGenreId == undefined) {
+      this.noVideoMessage = 'Select a genre to play a random video';
+    } else {
+      this.noVideoMessage = 'No more videos in genre';
+    }
+
+    this.isDisplayNoVideoMessage = true;
+    this.isNextButtonEnabled = false;
+  }
+
+  updateGenreCookie(genreId, video: Video) {
+    const seenVideosCookie = this.getCookie(genreId);
+    // Create a new cookie for this genre if none exists.
+    if (seenVideosCookie == undefined) {
+      this.putCookie(genreId, JSON.stringify([ this.randomVideo.id ]));
+    } else { // Otherwise, add the video id to the existing cookie.
+      const genreArray = JSON.parse(seenVideosCookie);
+      genreArray.push(this.randomVideo.id);
+      this.putCookie(genreId, JSON.stringify(genreArray));
+    }
+  }
+
+  onGenreSelect(genreId) {
     // record current genre to reload next time the user visits the site
     if (genreId == null) {
-      this.putCookie('currentGenreId', null);
+      this.putCookie(this.COOKIE_CURRENT_GENRE_ID, null);
       this.seenVideosForGenre = null;
       this.randomVideo = null;
+      this.updateDisplayNoVideos();
     } else {
-      this.putCookie('currentGenreId', genreId.toString());
+      this.putCookie(this.COOKIE_CURRENT_GENRE_ID, genreId.toString());
       this.getRandomVideoAndMarkAsViewed();
-      
       this.getSeenVideosForGenre(genreId);
     }
   }
 
   getSeenVideosForGenre(genreId) {
-    let includeIds = [''];
-    let seenVideosCookie = this.getCookie(genreId.toString());
+    const seenVideoIds = this.getSeenVideoIdsFromGenreCookie(genreId);
+    console.log('in method');
 
-    if (seenVideosCookie !== undefined) {
-      includeIds = JSON.parse(seenVideosCookie);
-    }
-
-    this.videoService.getSeenVideosForGenre(this.selectedGenreId, includeIds)
+    this.videoService.getSeenVideosForGenre(this.selectedGenreId, seenVideoIds)
       .subscribe( data => {
         this.seenVideosForGenre = data;
+        console.log(this.seenVideosForGenre);
       });
+  }
+
+  getSeenVideoIdsFromGenreCookie(genreId) {
+    let seenVideoIds = [''];
+    const seenVideosCookie = this.getCookie(genreId.toString());
+
+    if (seenVideosCookie !== undefined) {
+      seenVideoIds = JSON.parse(seenVideosCookie);
+    }
+
+    return seenVideoIds;
   }
 
   getCookie(key: string) {
@@ -123,11 +141,19 @@ export class VideoComponent implements OnInit {
     return this._cookieService.put(key, value);
   }
 
+  getCookieObject(key: string) {
+    return this._cookieService.getObject(key);
+  }
+
+  putCookieObject(key: string, value: Object) {
+    return this._cookieService.putObject(key, value);
+  }
+
   deleteCookies(key: string, value: string) {
     return this._cookieService.removeAll();
   }
 
-  getRandomId() {
+  generateRandomUserId() {
     return Math.floor((Math.random() * 6) + 1).toString();
   }
 

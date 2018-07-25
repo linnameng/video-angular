@@ -19,7 +19,7 @@
 
       <h5>Currently Watching</h5>
 
-      <div *ngIf="randomVideo">
+      <div *ngIf="randomVideo; else noVideoContainer">
         <div id="current-video-container">
           <div class="current-video-thumbnail" [style.background-color]="randomVideo.color"></div>
           <div class="current-video-name">
@@ -31,15 +31,19 @@
           <div style="clear: both;"></div>
         </div>
       </div>
+      <ng-template #noVideoContainer>
+        <div class="no-video-message">{{ noVideoMessage }}</div>
+      </ng-template>
 
-      <button class="next-video-button" (click)="getNextNewVideo()">Next New Video</button>
+      <button [disabled]="!isNextButtonEnabled" class="next-video-button" (click)="onClickNextVideoButton()">Next New Video</button>
 
       <h5>Previously Viewed</h5>
 
-      <table>
+      <table class="seen-video-table">
         <tr *ngFor="let seenVideo of seenVideosForGenre">
+          <td class="seen-thumbnail" [style.background-color]="seenVideo?.color"></td>
           <td>{{seenVideo?.name}}</td>
-          <td>{{seenVideo?.genre.name}}</td>
+          <td>({{seenVideo?.genre.name}})</td>
         </tr>
       </table>
     </div>

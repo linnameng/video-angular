@@ -3,6 +3,14 @@
   width: 150px;
 }
 
+.no-video-message {
+  font-size: 1.5rem;
+  text-align: center;
+  line-height: 200px;
+  vertical-align: middle;
+  color: #555;
+}
+
 .current-video-container {
   height: 275px;
 }
@@ -24,5 +32,13 @@
 .next-video-button {
   width: 350px;
   display: block;
-  margin: 10px auto;
+  margin: 30px auto;
+}
+
+.seen-video-table td {
+  height: 50px;
+}
+
+.seen-thumbnail {
+  width: 100px;
 }
