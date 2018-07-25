@@ -38,14 +38,19 @@
       <button [disabled]="!isNextButtonEnabled" class="next-video-button" (click)="onClickNextVideoButton()">Next New Video</button>
 
       <h5>Previously Viewed</h5>
-
-      <table class="seen-video-table">
-        <tr *ngFor="let seenVideo of seenVideosForGenre">
-          <td class="seen-thumbnail" [style.background-color]="seenVideo?.color"></td>
-          <td>{{seenVideo?.name}}</td>
-          <td>({{seenVideo?.genre.name}})</td>
-        </tr>
-      </table>
+      <div *ngIf="seenVideosForGenre && seenVideosForGenre.length; else noSeenVideosContainer">
+        <table class="seen-video-table">
+          <tr *ngFor="let seenVideo of seenVideosForGenre.slice().reverse()">
+            <td class="seen-thumbnail" [style.background-color]="seenVideo?.color"></td>
+            <td>{{seenVideo?.name}}</td>
+            <td>({{seenVideo?.genre.name}})</td>
+            <td>{{seenVideo?.viewed | date: 'medium'}}</td>
+          </tr>
+        </table>
+      </div>
+      <ng-template #noSeenVideosContainer>
+          <div class="no-video-message">You have not seen any videos in this genre</div>
+        </ng-template>
     </div>
 
   </div>

@@ -8,6 +8,6 @@ export class Video {
   name: string;
   genre: Genre;
   colour: string;
-  viewed: string;
+  viewed: number;
 }
 

@@ -70,11 +70,13 @@ export class VideoComponent implements OnInit {
           return;
         }
         this.isNextButtonEnabled = true;
+        this.randomVideo.viewed = Date.now();
         this.updateGenreCookie(genreId, this.randomVideo);
       });
   }
 
   updateDisplayNoVideos() {
+    console.log('display no videos');
     if (this.selectedGenreId == undefined) {
       this.noVideoMessage = 'Select a genre to play a random video';
     } else {
@@ -89,10 +91,10 @@ export class VideoComponent implements OnInit {
     const seenVideosCookie = this.getCookie(genreId);
     // Create a new cookie for this genre if none exists.
     if (seenVideosCookie == undefined) {
-      this.putCookie(genreId, JSON.stringify([ this.randomVideo.id ]));
+      this.putCookie(genreId, JSON.stringify([ video ]));
     } else { // Otherwise, add the video id to the existing cookie.
       const genreArray = JSON.parse(seenVideosCookie);
-      genreArray.push(this.randomVideo.id);
+      genreArray.push(this.randomVideo);
       this.putCookie(genreId, JSON.stringify(genreArray));
     }
   }
@@ -112,14 +114,12 @@ export class VideoComponent implements OnInit {
   }
 
   getSeenVideosForGenre(genreId) {
-    const seenVideoIds = this.getSeenVideoIdsFromGenreCookie(genreId);
-    console.log('in method');
-
-    this.videoService.getSeenVideosForGenre(this.selectedGenreId, seenVideoIds)
-      .subscribe( data => {
-        this.seenVideosForGenre = data;
-        console.log(this.seenVideosForGenre);
-      });
+    let seenVideos = [];
+    const seenVideosCookie = this.getCookie(genreId.toString());
+    if (seenVideosCookie != undefined) {
+      seenVideos = JSON.parse(seenVideosCookie);
+    }
+    this.seenVideosForGenre = seenVideos;
   }
 
   getSeenVideoIdsFromGenreCookie(genreId) {
@@ -127,7 +127,8 @@ export class VideoComponent implements OnInit {
     const seenVideosCookie = this.getCookie(genreId.toString());
 
     if (seenVideosCookie !== undefined) {
-      seenVideoIds = JSON.parse(seenVideosCookie);
+      const seenVideosArray = JSON.parse(seenVideosCookie);
+      seenVideoIds = seenVideosArray.map(video => video.id);
     }
 
     return seenVideoIds;
@@ -139,18 +140,6 @@ export class VideoComponent implements OnInit {
 
   putCookie(key: string, value: string) {
     return this._cookieService.put(key, value);
-  }
-
-  getCookieObject(key: string) {
-    return this._cookieService.getObject(key);
-  }
-
-  putCookieObject(key: string, value: Object) {
-    return this._cookieService.putObject(key, value);
-  }
-
-  deleteCookies(key: string, value: string) {
-    return this._cookieService.removeAll();
   }
 
   generateRandomUserId() {
