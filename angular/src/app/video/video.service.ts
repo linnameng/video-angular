@@ -11,30 +11,28 @@ headers: new HttpHeaders({ 'Content-Type': 'application/json' })
 @Injectable()
 export class VideoService {
 
-  constructor(private http:HttpClient) {}
+  constructor(private http: HttpClient) {}
 
-  public getUnseenVideosForGenre(genreId: number, excludeIds: number[]) {
-    return this.http.get<Video[]>("/api/videos/exclude/" + excludeIds, {
+  public getSeenVideosForGenre(genreId: string, includeIds: string[]) {
+    return this.http.get<Video[]>('/api/videos/seen', {
       params: {
-        genreId: genreId
+        genreId: genreId,
+        includeIds: includeIds
       },
-    );
+    });
   }
 
-  public getSeenVideosForGenre(genreId: number, includeIds: number[]) {
-    return this.http.get<Video[]>("/api/videos/include/" + includeIds, {
+  public getRandomVideoForGenre(genreId: string, excludeIds: string[]) {
+    return this.http.get<Video>('/api/videos/random', {
       params: {
-        genreId: genreId
+        genreId: genreId,
+        excludeIds: excludeIds
       },
-    );
-  }
-
-  public getRandomVideoForGenre() {
-    return this.http.get<Video>("/api/videos/random");
+    });
   }
 
   public getAllGenres() {
-    return this.http.get<Genre[]>("/api/genres");
+    return this.http.get<Genre[]>('/api/genres');
   }
 
 }

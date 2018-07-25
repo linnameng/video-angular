@@ -8,7 +8,7 @@ import { AppComponent } from './app.component';
 import { VideoComponent } from './video/video.component';
 import { AppRoutingModule } from './app.routing.module';
 import { VideoService } from './video/video.service';
-import { HttpClientModule } from "@angular/common/http";
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [

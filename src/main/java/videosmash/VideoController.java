@@ -1,8 +1,6 @@
 package videosmash;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
@@ -26,8 +24,8 @@ public class VideoController {
         return genreRepository.findAll();
     }
 
-    @GetMapping("/videos/exclude/{excludeIds}")
-    public Collection<Video> getAllUnseenVideosForGenre(@PathVariable("excludeIds")
+    @GetMapping("/videos/exclude")
+    public Collection<Video> getAllUnseenVideosForGenre(@RequestParam("excludeIds")
                                                         Collection<Long>
                                                         excludeIds,
                                                 @RequestParam("genreId") Long
@@ -40,22 +38,43 @@ public class VideoController {
         return videoRepository.findByGenreIdAndIdNotIn(genreId, excludeIds);
     }
 
-    @GetMapping("/videos/include/{includeIds}")
-    public Collection<Video> getAllSeenVideosForGenre(@PathVariable("includeIds")
-                                                      Collection<Long> includeIds,
+    @GetMapping("/videos/seen")
+    public Collection<Video> getAllSeenVideosForGenre(@RequestParam("includeIds") Collection<Long> includeIds,
                                                       @RequestParam("genreId") Long genreId) {
         return videoRepository.findByGenreIdAndIdIn(genreId, includeIds);
     }
 
     @GetMapping("/videos/random")
-    public Video getRandomVideo() {
-        Long count = videoRepository.count();
-        int index = (int) (Math.random() * count);
-        Page<Video> videoPage = videoRepository.findAll(PageRequest.of(index, 1));
+    public Video getRandomUnseenVideoForGenre(@RequestParam("excludeIds") Collection<Long> excludeIds,
+                                              @RequestParam("genreId") Long genreId) {
         Video randomVideo = null;
-        if (videoPage.hasContent()) {
-            randomVideo = videoPage.getContent().get(0);
+
+        if (excludeIds.isEmpty()) {
+            randomVideo = videoRepository.findRandomByGenreId(genreId);
+        } else {
+            randomVideo = videoRepository.findRandomByGenreIdAndIdNotIn(genreId, excludeIds);
         }
+
         return randomVideo;
     }
+
+//    @GetMapping("/videos/random")
+//    public Video getRandomUnseenVideoForGenre(@RequestParam("excludeIds") Collection<Long> excludeIds,
+//                                              @RequestParam("genreId") Long genreId) {
+//        Long count = videoRepository.count();
+//        int index = (int) (Math.random() * count);
+//        Page<Video> videoPage = null;
+//
+//        if (excludeIds.isEmpty()) {
+//            videoPage = videoRepository.findByGenreId(genreId, PageRequest.of(index, 1));
+//        } else {
+//            videoPage = videoRepository.findByGenreIdAndIdNotIn(genreId, excludeIds, PageRequest.of(index, 1));
+//        }
+//
+//        Video randomVideo = null;
+//        if (videoPage.hasContent()) {
+//            randomVideo = videoPage.getContent().get(0);
+//        }
+//        return randomVideo;
+//    }
 }
