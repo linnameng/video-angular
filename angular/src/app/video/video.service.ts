@@ -13,11 +13,23 @@ export class VideoService {
 
   constructor(private http:HttpClient) {}
 
-  public getVideos() {
-    return this.http.get<Video[]>("/api/videos");
+  public getUnseenVideosForGenre(genreId: number, excludeIds: number[]) {
+    return this.http.get<Video[]>("/api/videos/exclude/" + excludeIds, {
+      params: {
+        genreId: genreId
+      },
+    );
   }
 
-  public getRandomVideo() {
+  public getSeenVideosForGenre(genreId: number, includeIds: number[]) {
+    return this.http.get<Video[]>("/api/videos/include/" + includeIds, {
+      params: {
+        genreId: genreId
+      },
+    );
+  }
+
+  public getRandomVideoForGenre() {
     return this.http.get<Video>("/api/videos/random");
   }
 

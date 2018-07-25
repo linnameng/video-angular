@@ -3,10 +3,7 @@ package videosmash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 
@@ -30,22 +27,24 @@ public class VideoController {
     }
 
     @GetMapping("/videos/exclude/{excludeIds}")
-    public Collection<Video> getAllUnseenVideos(@PathVariable("excludeIds")
+    public Collection<Video> getAllUnseenVideosForGenre(@PathVariable("excludeIds")
                                                         Collection<Long>
-                                                            excludeIds) {
+                                                        excludeIds,
+                                                @RequestParam("genreId") Long
+                                                        genreId) {
         // calling findByIdNotIn(null) returns null, when we really want to
         // retrieve everything for that case
         if (excludeIds.isEmpty()) {
             return videoRepository.findAll();
         }
-        return videoRepository.findByIdNotIn(excludeIds);
+        return videoRepository.findByGenreIdAndIdNotIn(genreId, excludeIds);
     }
 
     @GetMapping("/videos/include/{includeIds}")
-    public Collection<Video> getAllSeenVideos(@PathVariable("includeIds")
-                                                      Collection<Long>
-                                                      includeIds) {
-        return videoRepository.findByIdIn(includeIds);
+    public Collection<Video> getAllSeenVideosForGenre(@PathVariable("includeIds")
+                                                      Collection<Long> includeIds,
+                                                      @RequestParam("genreId") Long genreId) {
+        return videoRepository.findByGenreIdAndIdIn(genreId, includeIds);
     }
 
     @GetMapping("/videos/random")
