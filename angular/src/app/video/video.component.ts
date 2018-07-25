@@ -37,15 +37,9 @@ export class VideoComponent implements OnInit {
   }
 
   ngOnInit() {
-    let includeIds = ['2', '3'];
-
     if (this.selectedGenreId != null) {
       this.getRandomVideoAndMarkAsViewed();
-
-      this.videoService.getSeenVideosForGenre(this.selectedGenreId, includeIds)
-        .subscribe( data => {
-          this.seenVideosForGenre = data;
-        });
+      this.getSeenVideosForGenre(this.selectedGenreId);
     }
 
     this.videoService.getAllGenres()
@@ -103,18 +97,22 @@ export class VideoComponent implements OnInit {
       this.putCookie('currentGenreId', genreId.toString());
       this.getRandomVideoAndMarkAsViewed();
       
-      let includeIds = [''];
-      let seenVideosCookie = this.getCookie(genreId.toString());
-  
-      if (seenVideosCookie !== undefined) {
-        includeIds = JSON.parse(seenVideosCookie);
-      }
-
-      this.videoService.getSeenVideosForGenre(this.selectedGenreId, includeIds)
-        .subscribe( data => {
-          this.seenVideosForGenre = data;
-        });
+      this.getSeenVideosForGenre(genreId);
     }
+  }
+
+  getSeenVideosForGenre(genreId) {
+    let includeIds = [''];
+    let seenVideosCookie = this.getCookie(genreId.toString());
+
+    if (seenVideosCookie !== undefined) {
+      includeIds = JSON.parse(seenVideosCookie);
+    }
+
+    this.videoService.getSeenVideosForGenre(this.selectedGenreId, includeIds)
+      .subscribe( data => {
+        this.seenVideosForGenre = data;
+      });
   }
 
   getCookie(key: string) {
