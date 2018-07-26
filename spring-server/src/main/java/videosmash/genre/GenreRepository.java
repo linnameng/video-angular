@@ -1,4 +1,4 @@
-package videosmash;
+package videosmash.genre;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

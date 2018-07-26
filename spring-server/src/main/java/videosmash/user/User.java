@@ -1,4 +1,4 @@
-package videosmash;
+package videosmash.user;
 
 import javax.persistence.*;
 

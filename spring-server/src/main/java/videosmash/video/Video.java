@@ -1,4 +1,6 @@
-package videosmash;
+package videosmash.video;
+
+import videosmash.genre.Genre;
 
 import javax.persistence.*;
 
