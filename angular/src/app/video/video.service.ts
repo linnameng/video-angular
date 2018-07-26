@@ -1,8 +1,6 @@
 import {Injectable} from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-
-import { Video, Genre } from '../models/app.models';
-
+import { Video, Genre, UserVideo, User } from '../models/app.models';
 
 const httpOptions = {
 headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -13,20 +11,31 @@ export class VideoService {
 
   constructor(private http: HttpClient) {}
 
-  public getSeenVideosForGenre(genreId: string, includeIds: string[]) {
-    return this.http.get<Video[]>('/api/videos/seen', {
+  public createUser() {
+    return this.http.post<User>('/api/users/add', {});
+  }
+
+  public createUserVideo(video: Video, user: User) {
+    const newUserVideo: UserVideo = new UserVideo;
+    newUserVideo.video = video;
+    newUserVideo.user = user;
+    newUserVideo.viewed = Date.now();
+    return this.http.post<UserVideo>('/api/userVideos/add', newUserVideo);
+  }
+
+  public getUserVideosForGenre(genreId: string, userId: string) {
+    return this.http.get<UserVideo[]>('/api/userVideos/user/' + userId, {
       params: {
-        genreId: genreId,
-        includeIds: includeIds
+        genreId: genreId
       },
     });
   }
 
-  public getRandomVideoForGenre(genreId: string, excludeIds: string[]) {
+  public getRandomVideoForGenre(genreId: string, userId: string) {
     return this.http.get<Video>('/api/videos/random', {
       params: {
         genreId: genreId,
-        excludeIds: excludeIds
+        userId: userId
       },
     });
   }

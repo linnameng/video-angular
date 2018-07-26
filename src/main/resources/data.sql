@@ -25,11 +25,11 @@ insert into genres (id, name) values (24, 'Thriller');
 insert into genres (id, name) values (25, 'War');
 insert into genres (id, name) values (26, 'Western');
 
-insert into videos (id, name, genre_id, color) values (1, 'Video 96205', 12, '#89a759');
-insert into videos (id, name, genre_id, color) values (2, 'Video 69994', 25, '#2f52fb');
-insert into videos (id, name, genre_id, color) values (3, 'Video 28364', 18, '#1ab7eb');
-insert into videos (id, name, genre_id, color) values (4, 'Video 09568', 14, '#1d9182');
-insert into videos (id, name, genre_id, color) values (5, 'Video 27686', 18, '#28ccc5');
+insert into videos (id, name, genre_id, color) values (1, 'Video 96205', 1, '#89a759');
+insert into videos (id, name, genre_id, color) values (2, 'Video 69994', 2, '#2f52fb');
+insert into videos (id, name, genre_id, color) values (3, 'Video 28364', 3, '#1ab7eb');
+insert into videos (id, name, genre_id, color) values (4, 'Video 09568', 4, '#1d9182');
+insert into videos (id, name, genre_id, color) values (5, 'Video 27686', 4, '#28ccc5');
 insert into videos (id, name, genre_id, color) values (6, 'Video 35078', 11, '#4853e1');
 insert into videos (id, name, genre_id, color) values (7, 'Video 31897', 5, '#61c376');
 insert into videos (id, name, genre_id, color) values (8, 'Video 74022', 20, '#f0e061');

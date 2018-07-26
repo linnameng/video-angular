@@ -6,7 +6,7 @@
 
       <div class="genre-dropdown">
         Genre:
-        <select [(ngModel)]="selectedGenreId" (ngModelChange)="onGenreSelect(selectedGenreId)">
+        <select [(ngModel)]="currentGenreId" (ngModelChange)="onGenreSelect(currentGenreId)">
           <option [ngValue]="null">-- Please select --</option>
           <option *ngFor="let genre of allGenres" [value]="genre.id">
             {{ genre.name }}
@@ -19,14 +19,14 @@
 
       <h5>Currently Watching</h5>
 
-      <div *ngIf="randomVideo; else noVideoContainer">
+      <div *ngIf="currRandomVideo; else noVideoContainer">
         <div id="current-video-container">
-          <div class="current-video-thumbnail" [style.background-color]="randomVideo.color"></div>
+          <div class="current-video-thumbnail" [style.background-color]="currRandomVideo.color"></div>
           <div class="current-video-name">
-            {{ randomVideo.name }}
+            {{ currRandomVideo.name }}
           </div>
           <div class="current-video-genre">
-            {{randomVideo.genre.name}}
+            {{currRandomVideo.genre.name}}
           </div>
           <div style="clear: both;"></div>
         </div>
@@ -41,9 +41,9 @@
       <div *ngIf="seenVideosForGenre && seenVideosForGenre.length; else noSeenVideosContainer">
         <table class="seen-video-table">
           <tr *ngFor="let seenVideo of seenVideosForGenre.slice().reverse()">
-            <td class="seen-thumbnail" [style.background-color]="seenVideo?.color"></td>
-            <td>{{seenVideo?.name}}</td>
-            <td>({{seenVideo?.genre.name}})</td>
+            <td class="seen-thumbnail" [style.background-color]="seenVideo?.video.color"></td>
+            <td>{{seenVideo?.video.name}}</td>
+            <td>({{seenVideo?.video.genre.name}})</td>
             <td>{{seenVideo?.viewed | date: 'medium'}}</td>
           </tr>
         </table>

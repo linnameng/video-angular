@@ -1,7 +1,5 @@
 package videosmash;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
 
 @Entity
@@ -16,15 +14,6 @@ public class Video {
     @ManyToOne
     @JoinColumn(name = "genre_id")
     private Genre genre;
-
-    /*
-    @JoinColumn(name = "message_key")
-    @ManyToOne(targetEntity = Messages.class, fetch = FetchType.LAZY)
-    private Messages message;
-
-    @Column(name = "message_key", insertable = false, updatable = false)
-    private Long message_fk;
-     */
 
     public Video() {}
 

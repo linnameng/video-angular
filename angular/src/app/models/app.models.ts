@@ -7,7 +7,18 @@ export class Video {
   id: string;
   name: string;
   genre: Genre;
-  colour: string;
+  color: string;
+}
+
+export class User {
+  id: string;
+}
+
+export class UserVideo {
+  id: string;
+  user: User;
+  video: Video;
   viewed: number;
 }
+
 
