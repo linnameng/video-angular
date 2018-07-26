@@ -25,7 +25,7 @@ export class VideoComponent implements OnInit {
 
   COOKIE_USER = 'currentUserCookie';
   COOKIE_CURRENT_GENRE_ID = 'currentGenreId';
-  COOKIE_OPTIONS: CookieOptions;
+  COOKIE_OPTIONS: CookieOptions = {};
 
   constructor(private router: Router, private videoService: VideoService, private _cookieService: CookieService) {
     this.setupCookieOptions();
