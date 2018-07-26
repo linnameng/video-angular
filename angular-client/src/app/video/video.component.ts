@@ -29,38 +29,20 @@ export class VideoComponent implements OnInit {
 
   constructor(private router: Router, private videoService: VideoService, private _cookieService: CookieService) {
     this.setupCookieOptions();
-
-    this.currentUser = <User> this.getCookieObject(this.COOKIE_USER);
-    // if we have a returning user, load the latest genre they have viewed
-    if (this.currentUser != null) {
-      console.log('current user exists: ' + this.currentUser + ' id: ' + this.currentUser.id);
-      this.currentGenreId = this.getCookie(this.COOKIE_CURRENT_GENRE_ID);
-    } else {
-      this.createNewUserCookie();
-    }
   }
 
   ngOnInit() {
-    if (this.currentGenreId != null) {
-      this.getRandomVideo(this.currentGenreId);
-      this.loadSeenVideosForGenre(this.currentGenreId);
+    this.currentUser = <User> this.getCookieObject(this.COOKIE_USER);
+
+    if (this.currentUser == null) {
+      this.resetUserCookie();
     } else {
-      this.updateDisplayNoVideos();
+      this.fetchHistoryFromUserCookie(this.currentUser.id);
     }
 
     this.videoService.getAllGenres()
       .subscribe( data => {
         this.allGenres = data;
-      });
-  }
-
-  createNewUserCookie() {
-    this.videoService.createUser()
-      .subscribe( data => {
-        this.currentUser = data;
-        console.log('created user: ' + this.currentUser);
-        this.putCookieObject(this.COOKIE_USER, this.currentUser);
-        this.currentGenreId = null;
       });
   }
 
@@ -118,6 +100,45 @@ export class VideoComponent implements OnInit {
       this.getRandomVideo(genreId);
       this.loadSeenVideosForGenre(genreId);
     }
+  }
+
+  fetchHistoryFromUserCookie(userId) {
+    // check if the user exists in the database
+    this.videoService.getUser(userId)
+      .subscribe( data => {
+        this.currentUser = data;
+
+        // if the database was reset, reset the user's cookies
+        if (this.currentUser == null) {
+          this.resetUserCookie();
+          return;
+        }
+        console.log('found user in database, cookie is valid for: ' + this.currentUser.id);
+        this.currentGenreId = this.getCookie(this.COOKIE_CURRENT_GENRE_ID);
+
+        // set the genre to the user's most recent selection
+        if (this.currentGenreId != null) {
+          this.getRandomVideo(this.currentGenreId);
+          this.loadSeenVideosForGenre(this.currentGenreId);
+        } else { // the user had not selected any genre
+          this.updateDisplayNoVideos();
+        }
+      });
+  }
+
+  resetUserCookie() {
+    this.createNewUserCookie();
+    this.currentGenreId = null;
+    this.updateDisplayNoVideos();
+  }
+
+  createNewUserCookie() {
+    this.videoService.createUser()
+      .subscribe( data => {
+        this.currentUser = data;
+        this.putCookieObject(this.COOKIE_USER, this.currentUser);
+        this.currentGenreId = null;
+      });
   }
 
   getCookie(key: string) {

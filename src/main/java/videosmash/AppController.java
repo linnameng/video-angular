@@ -41,6 +41,11 @@ public class AppController {
         return newUser;
     }
 
+    @GetMapping("/users/{userId}")
+    public User getUserById(@PathVariable("userId") Long userId) {
+        return userRepository.findById(userId).orElse(null);
+    }
+
     @GetMapping("/videos/random")
     public Video getRandomUnseenVideoForUserByGenre(@RequestParam("userId") Long userId, @RequestParam("genreId") Long genreId) {
         Video randomVideo = videoRepository.findRandomByGenreIdAndUserId(genreId, userId);

@@ -15,6 +15,10 @@ export class VideoService {
     return this.http.post<User>('/api/users/add', {});
   }
 
+  public getUser(userId: string) {
+    return this.http.get<User>('/api/users/' + userId);
+  }
+
   public createUserVideo(video: Video, user: User) {
     const newUserVideo: UserVideo = new UserVideo;
     newUserVideo.video = video;
